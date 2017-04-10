@@ -21,4 +21,5 @@ while True:
          PROXY_PORT, CLIENT_PORT)
     os.system("curl --request GET --proxy 127.0.0.1:%s geeksforgeeks.org" % (
         PROXY_PORT))
+    os.system("curl ")
     time.sleep(10)
