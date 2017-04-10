@@ -19,6 +19,6 @@ while True:
     METHOD = D[int(random.random() * len(D))]
     print 'sending request - ', "curl --request %s --proxy 127.0.0.1:%s --local-port %s 127.0.0.1:%s/%s" % (
         METHOD, PROXY_PORT, CLIENT_PORT, SERVER_PORT, filename)
-    os.system("curl --request %s --proxy 127.0.0.1:%s --local-port %s 127.0.0.1:%s/%s" % (
-        METHOD, PROXY_PORT, CLIENT_PORT, SERVER_PORT, filename))
+    os.system("curl --request %s --local-port %s 127.0.0.1:%s/%s" % (
+        METHOD, CLIENT_PORT, SERVER_PORT, filename))
     time.sleep(10)
