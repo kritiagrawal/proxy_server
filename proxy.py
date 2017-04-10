@@ -10,7 +10,7 @@ config = {
     "CONNECTION_TIMEOUT": 15
 }
 
-blacklisted = ("google","geeksforgeeks")
+blacklisted = ("google","geeksforgeeks","wikipedia")
 
 class Server:
     def __init__(self, config):

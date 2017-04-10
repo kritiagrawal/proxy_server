@@ -12,7 +12,7 @@ PORT = int(sys.argv[1])
 
 
 class HTTPCacheRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
-     def send_head(self):
+    def send_head(self):
         print 'in f1'
         if self.command != "POST" and self.headers.get('If-Modified-Since', None):
             print 'in if of f1'
