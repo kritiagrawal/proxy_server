@@ -3,11 +3,12 @@ import threading
 import signal
 import sys
 
+
 config =  {
             "HOST_NAME" : "127.0.0.1",
             "BIND_PORT" : 20000,
-            "MAX_REQUEST_LEN" : 102400,
-            "CONNECTION_TIMEOUT" : 15
+            "MAX_REQUEST_LEN" : 1024,
+            "CONNECTION_TIMEOUT" : 10
           }
 
 
@@ -31,6 +32,13 @@ class Server:
 
 
     def proxy_thread(self, conn, client_addr):
+        """
+        *******************************************
+        *********** PROXY_THREAD FUNC *************
+          A thread to handle request from browser
+        *******************************************
+        """
+
         request = conn.recv(config['MAX_REQUEST_LEN'])        # get the request from browser
         first_line = request.split('\n')[0]                   # parse the first line
         url = first_line.split(' ')[1]                        # get url

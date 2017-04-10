@@ -40,13 +40,13 @@ class HTTPCacheRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
         print 'going out of f3'
 
-    def do_GET(self):
-        print 'in f4'
-        self.send_response(200)
-        self.send_header("Content-type", 'text/html')
-        SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
-        self.wfile.write("<html><head><title>Test</title></head></html>")
-        print 'going out of f4'
+    # def do_GET(self):
+    #     print 'in f4'
+    #     self.send_response(200)
+    #     self.send_header("Content-type", 'text/html')
+    #     SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
+    #     self.wfile.write("<html><head><title>Test</title></head></html>")
+    #     print 'going out of f4'
 
 s = SocketServer.ThreadingTCPServer(("", PORT), HTTPCacheRequestHandler)
 s.allow_reuse_address = True
