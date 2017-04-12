@@ -2,6 +2,9 @@ import socket
 import threading
 import signal
 import sys
+import hashlib
+import os
+import urllib2
 
 config = {
     "HOST_NAME": "127.0.0.1",
@@ -9,7 +12,7 @@ config = {
     "MAX_REQUEST_LEN": 102400,
     "CONNECTION_TIMEOUT": 15
 }
-
+flag = 0
 blacklisted = ("google","geeksforgeeks","wikipedia")
 
 class Server:
@@ -21,6 +24,44 @@ class Server:
             (config['HOST_NAME'], config['BIND_PORT']))  # bind the socket to a public host, and a port
         self.serverSocket.listen(10)  # become a server socket
         self.__clients = {}
+
+    def do_GET(self, site_name, port, request):
+        m = hashlib.md5()
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        cache_file = site_name.split('.')[0]
+        if os.path.exists(cache_file + ".cache"):
+            print "Cache hit"
+            data = open(cache_file + ".cache").readlines()
+            return data
+        else:
+            print "Cache miss"
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(config['CONNECTION_TIMEOUT'])
+            s.connect((site_name, port))
+            s.sendall(request)  # send request to webserver
+            data_full = ""
+            while 1:
+                data = s.recv(config['MAX_REQUEST_LEN'])  # receive data from web server
+                open(cache_file + ".cache", 'wb').writelines(data)
+                data_full += data
+                if s:
+                    s.close()
+            return data_full
+        # m.update(self.path)
+        # cache_filename = m.hexdigest() + ".cached"
+        # if os.path.exists(cache_filename):
+        #   print "Cache hit"
+        #   data = open(cache_filename).readlines()
+        #   return ("hit", data)
+        # else:
+        #   print "Cache miss"
+        #   data = urllib2.urlopen("http:/" + self.path).readlines()
+        #   open(cache_filename, 'wb').writelines(data)
+        #   return ("miss", data)
+        # return
+        #self.send_response(200)
+        #self.end_headers()
+        #self.wfile.writelines(data)
 
     def listenForClient(self):
         while True:
@@ -64,32 +105,30 @@ class Server:
 
         try:
             print webserver, port
+            print "Webserver is "
+            print webserver
             for i in range(len(blacklisted)):
                 if blacklisted[i] in webserver:
                     flag = 1
-
             # create a socket to connect to the web server
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(config['CONNECTION_TIMEOUT'])
-            if flag is 0:
-                s.connect((webserver, port))
-                s.sendall(request)  # send request to webserver
-
-            if flag is 0:
-                while 1:
-                    data = s.recv(config['MAX_REQUEST_LEN'])  # receive data from web server
-                    if len(data) > 0:
-                        conn.send(data)  # send to browser
-                    else:
-                        break
-            else:
-                conn.send("This site is blacklisted\n")
-            s.close()
-            conn.close()
+            # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # s.settimeout(config['CONNECTION_TIMEOUT'])
+            # if flag is 0:
+            #     s.connect((webserver, port))
+            #     s.sendall(request)  # send request to webserver
+            #
+            # if flag is 0:
+            #     while 1:
+            #         data = s.recv(config['MAX_REQUEST_LEN'])  # receive data from web server
+            #         if len(data) > 0:
+            #             conn.send(data)  # send to browser
+            #         else:
+            #             break
+            data = self.do_GET(webserver, port, request)
+            str1 = ''.join(data)
+            conn.send(str1)
         except socket.error as error_msg:
             print 'ERROR: ', client_addr, error_msg
-            if s:
-                s.close()
             if conn:
                 conn.close()
 
