@@ -4,6 +4,7 @@ import signal
 import sys
 import hashlib
 import os
+import httplib
 import urllib2
 
 config = {
@@ -13,7 +14,8 @@ config = {
     "CONNECTION_TIMEOUT": 15
 }
 flag = 0
-blacklisted = ("google","geeksforgeeks","wikipedia")
+blacklisted = ("google", "wikipedia")
+
 
 class Server:
     def __init__(self, config):
@@ -32,19 +34,11 @@ class Server:
         cache_file = site_name.split('.')[0]
         if os.path.exists(cache_file + ".cache"):
             print "Cache hit"
-            # data = open(cache_file+ ".cache").readlines()
-            # print data
-            # return data
+            data = open(cache_file+ ".cache").readlines()
+            print data
+            return data
         else:
             print "Cache miss"
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(config['CONNECTION_TIMEOUT'])
-            print site_name, port
-            ip = socket.gethostbyname(site_name)
-            print ip
-            s.connect((ip, port))
-            print 'connect ho gaya'
-            print request
             req_split = request.split('\r\n')
             http = req_split[0].split(' ')
             print req_split
@@ -52,39 +46,56 @@ class Server:
             term = http[1]
             slash = term.find('0/')
             print slash
-            term = term[slash+1:]
+            term = term[slash + 1:]
             print term
-            http[1] = term
-            print http
-            req_split[0] = ' '.join(http)
-            print req_split
-            request = '\n'.join(req_split)
-            s.sendall(request)  # send request to webserver
-            data_full = ""
-            print 'going to recv data   '
-            while 1:
-                data = s.recv(config['MAX_REQUEST_LEN'])  # receive data from web server
-                print data
-                open(cache_file + ".cache", 'wb').writelines(data)
-                data_full += data
-                if s:
-                    break
-            return data_full
-        # m.update(self.path)
-        # cache_filename = m.hexdigest() + ".cached"
-        # if os.path.exists(cache_filename):
-        #   print "Cache hit"
-        #   data = open(cache_filename).readlines()
-        #   return ("hit", data)
-        # else:
-        #   print "Cache miss"
-        #   data = urllib2.urlopen("http:/" + self.path).readlines()
-        #   open(cache_filename, 'wb').writelines(data)
-        #   return ("miss", data)
-        # return
-        #self.send_response(200)
-        #self.end_headers()
-        #self.wfile.writelines(data)
+            conn = httplib.HTTPConnection('localhost',20010)
+            conn.request(http[0],term)
+            r1 = conn.getresponse()
+            print r1.status
+            data1 = r1.read()
+            # print data1
+            # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # s.settimeout(config['CONNECTION_TIMEOUT'])
+            # print site_name, port
+            # ip = socket.gethostbyname(site_name)
+            # print ip
+            # s.connect((ip, port))
+            # print 'connect ho gaya'
+            # print request
+
+
+            # http[1] = term
+            # print http
+            # req_split[0] = ' '.join(http)
+            # print req_split
+            # del req_split[len(req_split)-1]
+            # request = '\n'.join(req_split)
+            # print request
+            # s.sendall(request)  # send request to webserver
+            # data_full = ""
+            # print 'going to recv data   '
+            # while 1:
+            #     data = s.recv(config['MAX_REQUEST_LEN'])  # receive data from web server
+            #     print data
+            #     open(cache_file + ".cache", 'wb').writelines(data)
+            #     data_full += data
+            #     break
+            return data1
+            # m.update(self.path)
+            # cache_filename = m.hexdigest() + ".cached"
+            # if os.path.exists(cache_filename):
+            #   print "Cache hit"
+            #   data = open(cache_filename).readlines()
+            #   return ("hit", data)
+            # else:
+            #   print "Cache miss"
+            #   data = urllib2.urlopen("http:/" + self.path).readlines()
+            #   open(cache_filename, 'wb').writelines(data)
+            #   return ("miss", data)
+            # return
+            # self.send_response(200)
+            # self.end_headers()
+            # self.wfile.writelines(data)
 
     def listenForClient(self):
         while True:
@@ -148,13 +159,14 @@ class Server:
             #         else:
             #             break
             data = self.do_GET(webserver, port, request)
-            print 'Sending to client',data
-            str1 = ''.join(data)
-            conn.send(str1)
+            print 'Sending to client \n', data
+            # str1 =
+            conn.send(data)
+
         except socket.error as error_msg:
             print 'ERROR: ', client_addr, error_msg
-            if conn:
-                conn.close()
+        if conn:
+            conn.close()
 
     def _getClientName(self, cli_addr):
         """ Return the clientName.

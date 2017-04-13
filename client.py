@@ -30,7 +30,7 @@ while True:
     print 'sending request - ', "curl --request %s --proxy 127.0.0.1:%s --local-port %s 127.0.0.1:%s/%s" % (
         METHOD, PROXY_PORT, CLIENT_PORT, SERVER_PORT, filename)
 
-    os.system("curl --request %s  --proxy 127.0.0.1:%s 127.0.0.1:%s/%s" % (
-        METHOD, PROXY_PORT, SERVER_PORT, filename))
+    os.system("curl --request %s   127.0.0.1:%s/%s" % (
+        METHOD, SERVER_PORT, filename))
 
     time.sleep(10)
