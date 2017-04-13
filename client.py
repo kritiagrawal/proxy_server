@@ -17,7 +17,7 @@ D = {0: "GET", 1: "GET"}
 while True:
     filename = "%d.data" % (int(random.random() * 2) + 1)
     METHOD = D[int(random.random() * len(D))]
-    CLIENT_PORT = str(random.randint(int(CLIENT_PORTA), int(CLIENT_PORTA) + 6))
+    CLIENT_PORT = str(random.randint(int(CLIENT_PORTA), int(CLIENT_PORTA) + 10))
 
     print 'sending request - ', "curl --request GET --proxy 127.0.0.1:%s --local-port %s geeksforgeeks.org" % (
         PROXY_PORT, CLIENT_PORT)
@@ -30,7 +30,7 @@ while True:
     print 'sending request - ', "curl --request %s --proxy 127.0.0.1:%s --local-port %s 127.0.0.1:%s/%s" % (
         METHOD, PROXY_PORT, CLIENT_PORT, SERVER_PORT, filename)
 
-    os.system("curl --request %s --local-port %s 127.0.0.1:%s/%s" % (
-        METHOD, CLIENT_PORT, SERVER_PORT, filename))
+    os.system("curl --request %s  --proxy 127.0.0.1:%s 127.0.0.1:%s/%s" % (
+        METHOD, PROXY_PORT, SERVER_PORT, filename))
 
     time.sleep(10)

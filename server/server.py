@@ -14,6 +14,7 @@ PORT = int(sys.argv[1])
 class HTTPCacheRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def send_head(self):
         print 'in f1'
+        print self.command,'\n', self.headers
         if self.command != "POST" and self.headers.get('If-Modified-Since', None):
             print 'in if of f1'
             filename = self.path.strip("/")
@@ -48,7 +49,7 @@ class HTTPCacheRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     #     self.wfile.write("<html><head><title>Test</title></head></html>")
     #     print 'going out of f4'
 
-s = SocketServer.ThreadingTCPServer(("", PORT), HTTPCacheRequestHandler)
+s = SocketServer.ThreadingTCPServer(("127.0.0.1", PORT), HTTPCacheRequestHandler)
 s.allow_reuse_address = True
 print "Serving on port", PORT
 print 'going to serve_forever()'

@@ -26,26 +26,49 @@ class Server:
         self.__clients = {}
 
     def do_GET(self, site_name, port, request):
+        print request
         m = hashlib.md5()
         dir_path = os.path.dirname(os.path.realpath(__file__))
         cache_file = site_name.split('.')[0]
         if os.path.exists(cache_file + ".cache"):
             print "Cache hit"
-            data = open(cache_file + ".cache").readlines()
-            return data
+            # data = open(cache_file+ ".cache").readlines()
+            # print data
+            # return data
         else:
             print "Cache miss"
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(config['CONNECTION_TIMEOUT'])
-            s.connect((site_name, port))
+            print site_name, port
+            ip = socket.gethostbyname(site_name)
+            print ip
+            s.connect((ip, port))
+            print 'connect ho gaya'
+            print request
+            req_split = request.split('\r\n')
+            http = req_split[0].split(' ')
+            print req_split
+            print http
+            term = http[1]
+            slash = term.find('0/')
+            print slash
+            term = term[slash+1:]
+            print term
+            http[1] = term
+            print http
+            req_split[0] = ' '.join(http)
+            print req_split
+            request = '\n'.join(req_split)
             s.sendall(request)  # send request to webserver
             data_full = ""
+            print 'going to recv data   '
             while 1:
                 data = s.recv(config['MAX_REQUEST_LEN'])  # receive data from web server
+                print data
                 open(cache_file + ".cache", 'wb').writelines(data)
                 data_full += data
                 if s:
-                    s.close()
+                    break
             return data_full
         # m.update(self.path)
         # cache_filename = m.hexdigest() + ".cached"
@@ -105,8 +128,8 @@ class Server:
 
         try:
             print webserver, port
-            print "Webserver is "
-            print webserver
+            # print "Webserver is "
+            # print webserver
             for i in range(len(blacklisted)):
                 if blacklisted[i] in webserver:
                     flag = 1
@@ -125,6 +148,7 @@ class Server:
             #         else:
             #             break
             data = self.do_GET(webserver, port, request)
+            print 'Sending to client',data
             str1 = ''.join(data)
             conn.send(str1)
         except socket.error as error_msg:
