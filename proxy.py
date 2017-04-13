@@ -88,6 +88,7 @@ class Server:
                     port = 80
             print ct,port
             newi=0
+            bestok=0
             string_is = ct+term
             for lm in range(len(self.sites_visited)):
                 if self.sites_visited[lm] in site:
@@ -101,6 +102,7 @@ class Server:
                         print self.sites_count[lm]
                         if self.sites_count[lm]==3:
                             print "Cache will happen!"
+                            bestok=1
                     newi = 1
             if newi==0:
                 self.sites_count = self.sites_count + [0]
