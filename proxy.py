@@ -125,6 +125,7 @@ class Server:
                 r1 = conn.getresponse()
                 print r1.status
                 data1 = r1.read()
+                open(cache_file + ".cache", 'wb').writelines(data1)
             else:
                 data1 = 'Sorry. Blacklisted site\n'
             # print data1
