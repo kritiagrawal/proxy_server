@@ -13,10 +13,10 @@ PORT = int(sys.argv[1])
 
 class HTTPCacheRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def send_head(self):
-        print 'in f1'
-        print self.command,'\n', self.headers
+        # print 'in f1'
+        # print self.command,'\n', self.headers
         if self.command != "POST" and self.headers.get('If-Modified-Since', None):
-            print 'in if of f1'
+            # print 'in if of f1'
             filename = self.path.strip("/")
             if os.path.isfile(filename):
                 a = time.strptime(time.ctime(os.path.getmtime(filename)), "%a %b %d %H:%M:%S %Y")
@@ -25,21 +25,21 @@ class HTTPCacheRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     self.send_response(304)
                     self.end_headers()
                     return None
-        print 'going out of f1'
+        # print 'going out of f1'
         return SimpleHTTPServer.SimpleHTTPRequestHandler.send_head(self)
 
     def end_headers(self):
-        print 'in f2'
+        # print 'in f2'
         self.send_header('Cache-control', 'must-revalidate')
         SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
-        print 'going out of f2'
+        # print 'going out of f2'
 
     def do_POST(self):
-        print 'in f3'
+        # print 'in f3'
         self.send_response(200)
         self.send_header('Cache-control', 'no-cache')
         SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
-        print 'going out of f3'
+        # print 'going out of f3'
 
     # def do_GET(self):
     #     print 'in f4'
@@ -52,5 +52,5 @@ class HTTPCacheRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 s = SocketServer.ThreadingTCPServer(("127.0.0.1", PORT), HTTPCacheRequestHandler)
 s.allow_reuse_address = True
 print "Serving on port", PORT
-print 'going to serve_forever()'
+# print 'going to serve_forever()'
 s.serve_forever()
