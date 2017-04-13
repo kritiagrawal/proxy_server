@@ -41,14 +41,39 @@ class Server:
             print "Cache miss"
             req_split = request.split('\r\n')
             http = req_split[0].split(' ')
-            print req_split
-            print http
+            # print req_split
+            # print http
             term = http[1]
             slash = term.find('0/')
-            print slash
+            # print slash
             term = term[slash + 1:]
-            print term
-            conn = httplib.HTTPConnection('localhost',20010)
+            # print term
+            site = http[1]
+            print site
+            if 'localhost' in site or '127.0.0' in site:
+                ct = 'localhost'
+                site = site.split('//')
+                site = site[1]
+                site = site.split('/')
+                site=site[0]
+                site = site.split(':')
+                site = site[1]
+                print site
+                port = site
+            else:
+                site = site.split('//')
+                site = site[1]
+                site = site.split('/')
+                site = site[0]
+                site = site.split(':')
+                print site
+                ct = site[0]
+                if len(site) > 1:
+                    port  = site[1]
+                else:
+                    port = 80
+            print ct,port
+            conn = httplib.HTTPConnection(ct,port)
             conn.request(http[0],term)
             r1 = conn.getresponse()
             print r1.status
@@ -108,7 +133,7 @@ class Server:
 
     def proxy_thread(self, conn, client_addr):
         request = conn.recv(config['MAX_REQUEST_LEN'])  # get the request from browser
-        print request
+        # print request
         first_line = request.split('\n')[0]  # parse the first line
         url = first_line.split(' ')[1]  # get url
 
